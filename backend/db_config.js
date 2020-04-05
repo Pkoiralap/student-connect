@@ -1,20 +1,20 @@
-const PERSON = 'Person';
-const COMMENTS = 'Comments';
-const POSTS = 'Posts';
-const EDUCATION = 'Education';
+const STUDENT = 'Student';
+const COMMENT = 'Comments';
+const POST = 'Posts';
+const SCHOOL = 'School';
 const RELATION = 'Relations';
 
 
 const collections = [
-    PERSON,
-    COMMENTS,
-    POSTS,
-    EDUCATION,
+    STUDENT,
+    COMMENT,
+    POST,
+    SCHOOL,
     RELATION
 ]
 
 
-const config =  {
+const config = {
     url: 'http://localhost:8529',
     username: 'root',
     password: '',
