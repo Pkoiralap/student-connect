@@ -5,11 +5,11 @@ const httpError = require('http-errors');
 const status = require('statuses');
 const errors = require('@arangodb').errors;
 const createRouter = require('@arangodb/foxx/router');
-const Relation = require('../models/relation');
+const School = require('../models/school');
 
-const Relations = module.context.collection('Relations');
+const SchoolItems = module.context.collection('School');
 const keySchema = joi.string().required()
-.description('The key of the relation');
+.description('The key of the school');
 
 const ARANGO_NOT_FOUND = errors.ERROR_ARANGO_DOCUMENT_NOT_FOUND.code;
 const ARANGO_DUPLICATE = errors.ERROR_ARANGO_UNIQUE_CONSTRAINT_VIOLATED.code;
@@ -21,82 +21,74 @@ const router = createRouter();
 module.exports = router;
 
 
-router.tag('relation');
-
-
-const NewRelation = Object.assign({}, Relation, {
-  schema: Object.assign({}, Relation.schema, {
-    _from: joi.string(),
-    _to: joi.string()
-  })
-});
+router.tag('school');
 
 
 router.get(function (req, res) {
-  res.send(Relations.all());
+  res.send(SchoolItems.all());
 }, 'list')
-.response([Relation], 'A list of Relations.')
-.summary('List all Relations')
+.response([School], 'A list of SchoolItems.')
+.summary('List all SchoolItems')
 .description(dd`
-  Retrieves a list of all Relations.
+  Retrieves a list of all SchoolItems.
 `);
 
 
 router.post(function (req, res) {
-  const relation = req.body;
+  const school = req.body;
   let meta;
   try {
-    meta = Relations.save(relation._from, relation._to, relation);
+    meta = SchoolItems.save(school);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_DUPLICATE) {
       throw httpError(HTTP_CONFLICT, e.message);
     }
     throw e;
   }
-  Object.assign(relation, meta);
+  Object.assign(school, meta);
   res.status(201);
   res.set('location', req.makeAbsolute(
-    req.reverse('detail', {key: relation._key})
+    req.reverse('detail', {key: school._key})
   ));
-  res.send(relation);
+  res.send(school);
 }, 'create')
-.body(NewRelation, 'The relation to create.')
-.response(201, Relation, 'The created relation.')
-.error(HTTP_CONFLICT, 'The relation already exists.')
-.summary('Create a new relation')
+.body(School, 'The school to create.')
+.response(201, School, 'The created school.')
+.error(HTTP_CONFLICT, 'The school already exists.')
+.summary('Create a new school')
 .description(dd`
-  Creates a new relation from the request body and
+  Creates a new school from the request body and
   returns the saved document.
 `);
 
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
-  let relation
+  let school
   try {
-    relation = Relations.document(key);
+    school = SchoolItems.document(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
     }
     throw e;
   }
-  res.send(relation);
+  res.send(school);
 }, 'detail')
 .pathParam('key', keySchema)
-.response(Relation, 'The relation.')
-.summary('Fetch a relation')
+.response(School, 'The school.')
+.summary('Fetch a school')
 .description(dd`
-  Retrieves a relation by its key.
+  Retrieves a school by its key.
 `);
 
 
 router.put(':key', function (req, res) {
   const key = req.pathParams.key;
-  const relation = req.body;
+  const school = req.body;
   let meta;
   try {
-    meta = Relations.replace(key, relation);
+    meta = SchoolItems.replace(key, school);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -106,15 +98,15 @@ router.put(':key', function (req, res) {
     }
     throw e;
   }
-  Object.assign(relation, meta);
-  res.send(relation);
+  Object.assign(school, meta);
+  res.send(school);
 }, 'replace')
 .pathParam('key', keySchema)
-.body(Relation, 'The data to replace the relation with.')
-.response(Relation, 'The new relation.')
-.summary('Replace a relation')
+.body(School, 'The data to replace the school with.')
+.response(School, 'The new school.')
+.summary('Replace a school')
 .description(dd`
-  Replaces an existing relation with the request body and
+  Replaces an existing school with the request body and
   returns the new document.
 `);
 
@@ -122,10 +114,10 @@ router.put(':key', function (req, res) {
 router.patch(':key', function (req, res) {
   const key = req.pathParams.key;
   const patchData = req.body;
-  let relation;
+  let school;
   try {
-    Relations.update(key, patchData);
-    relation = Relations.document(key);
+    SchoolItems.update(key, patchData);
+    school = SchoolItems.document(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -135,14 +127,14 @@ router.patch(':key', function (req, res) {
     }
     throw e;
   }
-  res.send(relation);
+  res.send(school);
 }, 'update')
 .pathParam('key', keySchema)
-.body(joi.object().description('The data to update the relation with.'))
-.response(Relation, 'The updated relation.')
-.summary('Update a relation')
+.body(joi.object().description('The data to update the school with.'))
+.response(School, 'The updated school.')
+.summary('Update a school')
 .description(dd`
-  Patches a relation with the request body and
+  Patches a school with the request body and
   returns the updated document.
 `);
 
@@ -150,7 +142,7 @@ router.patch(':key', function (req, res) {
 router.delete(':key', function (req, res) {
   const key = req.pathParams.key;
   try {
-    Relations.remove(key);
+    SchoolItems.remove(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -160,7 +152,7 @@ router.delete(':key', function (req, res) {
 }, 'delete')
 .pathParam('key', keySchema)
 .response(null)
-.summary('Remove a relation')
+.summary('Remove a school')
 .description(dd`
-  Deletes a relation from the database.
+  Deletes a school from the database.
 `);

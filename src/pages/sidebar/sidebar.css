@@ -1,0 +1,30 @@
+.side-bar {
+    padding: 10px;
+    width: 250px;
+    background: rgb(240, 240, 240);
+    height: 100vh;
+    position: fixed;
+    left: 0px;
+}
+
+.side-bar ul {
+    justify-content: center;
+    align-items: center;
+}
+
+.side-bar li {
+    height: 50px;
+    background-color: rgb(230, 230, 230);
+    margin: 10px;
+    line-height: 50px;
+    padding-left: 74px;
+}
+
+.main-content {
+    position: fixed;
+    left: 250px;
+    width: calc(100% - 250px);
+    padding: 20px;
+    height: 100vh;
+    overflow: auto;
+}
