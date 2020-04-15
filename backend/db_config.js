@@ -18,7 +18,7 @@ const collections = {
 }
 
 
-const config =  {
+const config = {
     url: 'http://localhost:8529',
     username: 'root',
     password: '',

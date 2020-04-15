@@ -7,5 +7,3 @@ Used ArangoDB foxx services and React to create a simple social media website
 3. Run `npm run setup`
 7. Run `npm start`
 
-or alternatively
-
