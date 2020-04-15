@@ -3,7 +3,7 @@ import Popup from 'reactjs-popup';
 import uuid from "uuid/v4";
 import "./feedview.css";
 import { Card, Button } from 'react-bootstrap';
-import { postAPI, deleteAPI } from '../../api/api';
+import { postAPI, deleteAPI, patchAPI } from '../../api/api';
 
 export default class FeedView extends React.Component {
   state = {
@@ -11,7 +11,8 @@ export default class FeedView extends React.Component {
     disabled: {},
     show: "",
     items_to_show: [],
-    post_clicked: ""
+    post_clicked: "",
+    edit: undefined,
   }
 
   makeComment = async (postKey) => {
@@ -37,6 +38,7 @@ export default class FeedView extends React.Component {
     })
     const post_key = type === "post" ? key : this.state.post_clicked
     this.props.updatePost(post_key)
+    this.closeModal();
   }
 
   closeModal = () => {
@@ -64,14 +66,37 @@ export default class FeedView extends React.Component {
     this.closeModal();
   }
 
+  edit = (type, key, text) => async () => {
+    this.setState({
+      edit: {
+        type,
+        key,
+        text
+      }
+    })
+  }
+
+  makeEdit = async () => {
+    const {text, type, key} = this.state.edit || {};
+    if (!text || !type || !key) {
+      toastr.error("Edit feature is facing some trouble. Contact the system administration");
+      return;
+    }
+    await patchAPI(`${type}/${key}`, {[`${type}_text`]: text});
+    const post_key = type === "post" ? key : this.state.post_clicked
+    this.props.updatePost(post_key)
+    this.setState({edit: undefined})
+    this.closeModal()
+  }
+
   render() {
     const {posts} = this.props;
     return (
       <div className="feed-view">
         {
           posts.map(({student, post, likes_on_post, comments }) => (
-            <div key={post._key} className="post">
-              <Card className="post-card" style={{padding: 25, marginTop: 10, marginBottom: 10}}>
+            <div key={`feed-${post._key}`} className="post">
+              <Card key={`feed-card-${post._key}`}  className="post-card" style={{padding: 25, marginTop: 10, marginBottom: 10}}>
                 <a href={`/profile/${student._key}`}> {student.student_name} </a>
                 <br />
                 <div className="post-text"> {post.post_text} </div>
@@ -111,10 +136,16 @@ export default class FeedView extends React.Component {
                     Show all comments
                   </Button>
                   {
-                    student._key === this.props.student._key && 
-                      <Button variant="danger" onClick={this.delete("post", post._key)}>
-                        Delete
-                      </Button>
+                    student._key === this.props.student._key && (
+                      <div className="action-items" style={{display: "flex"}}>
+                        <Button variant="info" onClick={this.edit("post", post._key, post.post_text)}>
+                          Edit
+                        </Button>
+                        <Button variant="danger" onClick={this.delete("post", post._key)}>
+                          Delete
+                        </Button>
+                      </div>
+                    )
                   }
                 </div>
               </Card>
@@ -131,7 +162,7 @@ export default class FeedView extends React.Component {
             <div className="results">
               {
                 this.state.items_to_show.map(item => this.state.show === "Comments" ? (
-                  <Card className="post-card" style={{padding: 25, marginTop: 10, marginBottom: 10}}>
+                  <Card key={`comment-${item.comment._key}`} className="post-card" style={{padding: 25, marginTop: 10, marginBottom: 10}}>
                     <a href={`/profile/${item.student[0]._key}`}> {item.student[0].student_name} </a>
                     <br />
                     {
@@ -148,10 +179,16 @@ export default class FeedView extends React.Component {
                               {this.isLiked(item.likes_on_comment) ? "Unlike": "Like"}
                             </Button>
                             {
-                              item.student[0]._key === this.props.student._key && 
-                                <Button variant="danger" onClick={this.delete("comment", item.comment._key)}>
-                                  Delete
-                                </Button>
+                              item.student[0]._key === this.props.student._key && (
+                                <div className="action-items" style={{display: "flex"}}>
+                                  <Button variant="info" onClick={this.edit("comment", item.comment._key, item.comment.comment_text)}>
+                                    Edit
+                                  </Button>
+                                  <Button variant="danger" onClick={this.delete("comment", item.comment._key)}>
+                                    Delete
+                                  </Button>
+                                </div>
+                              )
                             }
                           </div>
                         </div>
@@ -165,6 +202,27 @@ export default class FeedView extends React.Component {
                 ))
               }
             </div>
+          </div>
+        </Popup>
+        <Popup
+          open={this.state.edit}
+          onClose={() => {this.setState({edit: undefined})}}
+          closeOnDocumentClick
+        >
+          <div style={{padding: 20}}>
+            <textarea
+              style={{width: "100%", maxWidth: 500}}
+              onChange={(e) => {
+                this.setState({edit: {
+                  ...this.state.edit,
+                  text: e.target.value
+                }})
+              }}
+              rows="5"
+              value={this.state.edit && this.state.edit.text}
+            />
+            <br />
+            <Button onClick={this.makeEdit}> Edit </Button>
           </div>
         </Popup>
       </div>

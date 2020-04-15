@@ -7,7 +7,7 @@ module.exports = {
     // Describe the attributes with joi here
     _key: joi.string(),
     post_text: joi.string(),
-    username: joi.string().required(),
+    username: joi.string(),
   },
   forClient(obj) {
     // Implement outgoing transformations here

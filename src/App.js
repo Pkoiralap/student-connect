@@ -20,13 +20,8 @@ const deleteLocalStorage = () => {
 
 class App extends React.Component{
   state={
-    logged_in: false,
-    user: {}
-  }
-
-  componentDidMount() {
-    const user = validateUser();
-    this.setState({ logged_in: !!user, user });
+    logged_in: !!validateUser(),
+    user: validateUser(),
   }
 
   login_success = (user) => {
@@ -40,17 +35,15 @@ class App extends React.Component{
   }
 
   render() {
-    if (this.state.logged_in) {
-      return (
-        <Container>
-          <Sidebar user={this.state.user} signout={this.signout}/>
-        </Container>
-      );
-    }
+    console.log(this.state.logged_in)
     return (
-      <Container>
-        <Login login_success={this.login_success} />;
-      </Container>
+      <div>
+        {this.state.logged_in ? (
+          <Sidebar user={this.state.user} signout={this.signout}/>
+        ): (
+          <Login login_success={this.login_success} />
+        )}
+      </div>
     )
   }
 }

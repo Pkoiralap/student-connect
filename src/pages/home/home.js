@@ -68,6 +68,7 @@ export default class Login extends React.Component {
           <Button onClick={this.postStatus}> Post </Button>
         </Card>
         <FeedView
+          from="home"
           student={this.props.student}
           updatePost={this.updatePost}
           user={this.props.user}

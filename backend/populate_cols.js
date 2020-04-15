@@ -148,11 +148,13 @@ for (let i = 0; i < 1000; i++) {
     });
 
     // makes_most relation
+    const toKey = faker.random.arrayElement(posts);
     save(relation, {
         type: 'makes_post',
         _from: `${Student}/${faker.random.arrayElement(students)}`,
-        _to: `${Post}/${faker.random.arrayElement(posts)}`,
+        _to: `${Post}/${toKey}`,
     });
+    posts.splice(posts.indexOf(toKey), 1)
 
     // interested in relation 
     save(relation, {
@@ -168,20 +170,21 @@ for (let i = 0; i < 1000; i++) {
         _to: `${Post}/${faker.random.arrayElement(posts)}`,
     });
     
-    const comment = `${Comment}/${faker.random.arrayElement(comments)}`;
+    const commentKey = faker.random.arrayElement(comments);
     // posts has comment relation
     save(relation, {
         type: 'post_has_comment',
         _from: `${Post}/${faker.random.arrayElement(posts)}`,
-        _to: comment,
+        _to: `${Comment}/${commentKey}`,
     });
 
       // makes_comment relation    
     save(relation, {
         type: 'makes_comment',
         _from: `${Student}/${faker.random.arrayElement(students)}`,
-        _to: comment,
+        _to: `${Comment}/${commentKey}`,
     });
+    comments.splice(comments.indexOf(commentKey), 1)
 
     // likes_comment relation
     save(relation, {

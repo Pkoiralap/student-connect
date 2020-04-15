@@ -134,7 +134,13 @@ class ProfileDisplay extends React.Component {
             })}
           </div>
         }
-        <FeedView student={this.props.student} updatePost={this.updatePost} user={this.props.user} posts={posts} />
+        <FeedView
+          from="profile"
+          student={this.props.student}
+          updatePost={this.updatePost}
+          user={this.props.user}
+          posts={posts}
+        />
 
         <Popup
           open={this.state.open && mutual.length !== 0}
