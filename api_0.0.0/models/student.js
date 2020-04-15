@@ -9,10 +9,11 @@ module.exports = {
     student_name: joi.string(),
     student_DOB: joi.date(),
     student_sex: joi.string().allow(["M", "F"]),
-
-    street: joi.string(),
-    city: joi.string(),
-    state: joi.string(),
+    student_address: joi.object({
+      street: joi.string(),
+      city: joi.string(),
+      state: joi.string(),
+    }),
   },
   forClient(obj) {
     // Implement outgoing transformations here

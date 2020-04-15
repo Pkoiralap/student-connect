@@ -22,7 +22,6 @@ const initialValues = {
   student_name: "",
   student_DOB: "",
   student_sex: "",
-
   street: "",
   city: "",
   state: "",
@@ -48,6 +47,10 @@ export default class Profile extends React.Component {
         toUpdate = {...userProfile.data.profile, created: true}
         toUpdate.school = {value: toUpdate.school.school_name, label: toUpdate.school.school_name};
         toUpdate.topics = toUpdate.topics.map(item => ({ value: item.topic_text, label: item.topic_text }));
+
+        const {street, city, state} = toUpdate.student_address;
+        delete toUpdate.student_address;
+        toUpdate = {...toUpdate, street, city, state};
       }
       const {data: schools} = await getAPI("school");
       const {data: topics} = await getAPI("topic");
@@ -63,9 +66,11 @@ export default class Profile extends React.Component {
       student_name: this.state.student_name,
       student_DOB: this.state.student_DOB,
       student_sex: this.state.student_sex,
-      street: this.state.street,
-      city: this.state.city,
-      state: this.state.state,
+      student_address: {
+        street: this.state.street,
+        city: this.state.city,
+        state: this.state.state,
+      }
     }
     if (this.state.created) {
       await putAPI(`/student/${this.state._key}`, newData);
