@@ -5,11 +5,11 @@ const httpError = require('http-errors');
 const status = require('statuses');
 const errors = require('@arangodb').errors;
 const createRouter = require('@arangodb/foxx/router');
-const Person = require('../models/person');
+const Topic = require('../models/topic');
 
-const PersonItems = module.context.collection('Person');
+const TopicItems = module.context.collection('Topic');
 const keySchema = joi.string().required()
-.description('The key of the person');
+.description('The key of the topic');
 
 const ARANGO_NOT_FOUND = errors.ERROR_ARANGO_DOCUMENT_NOT_FOUND.code;
 const ARANGO_DUPLICATE = errors.ERROR_ARANGO_UNIQUE_CONSTRAINT_VIOLATED.code;
@@ -21,74 +21,74 @@ const router = createRouter();
 module.exports = router;
 
 
-router.tag('person');
+router.tag('topic');
 
 
 router.get(function (req, res) {
-  res.send(PersonItems.all());
+  res.send(TopicItems.all());
 }, 'list')
-.response([Person], 'A list of PersonItems.')
-.summary('List all PersonItems')
+.response([Topic], 'A list of TopicItems.')
+.summary('List all TopicItems')
 .description(dd`
-  Retrieves a list of all PersonItems.
+  Retrieves a list of all TopicItems.
 `);
 
 
 router.post(function (req, res) {
-  const person = req.body;
+  const topic = req.body;
   let meta;
   try {
-    meta = PersonItems.save(person);
+    meta = TopicItems.save(topic);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_DUPLICATE) {
       throw httpError(HTTP_CONFLICT, e.message);
     }
     throw e;
   }
-  Object.assign(person, meta);
+  Object.assign(topic, meta);
   res.status(201);
   res.set('location', req.makeAbsolute(
-    req.reverse('detail', {key: person._key})
+    req.reverse('detail', {key: topic._key})
   ));
-  res.send(person);
+  res.send(topic);
 }, 'create')
-.body(Person, 'The person to create.')
-.response(201, Person, 'The created person.')
-.error(HTTP_CONFLICT, 'The person already exists.')
-.summary('Create a new person')
+.body(Topic, 'The topic to create.')
+.response(201, Topic, 'The created topic.')
+.error(HTTP_CONFLICT, 'The topic already exists.')
+.summary('Create a new topic')
 .description(dd`
-  Creates a new person from the request body and
+  Creates a new topic from the request body and
   returns the saved document.
 `);
 
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
-  let person
+  let topic
   try {
-    person = PersonItems.document(key);
+    topic = TopicItems.document(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
     }
     throw e;
   }
-  res.send(person);
+  res.send(topic);
 }, 'detail')
 .pathParam('key', keySchema)
-.response(Person, 'The person.')
-.summary('Fetch a person')
+.response(Topic, 'The topic.')
+.summary('Fetch a topic')
 .description(dd`
-  Retrieves a person by its key.
+  Retrieves a topic by its key.
 `);
 
 
 router.put(':key', function (req, res) {
   const key = req.pathParams.key;
-  const person = req.body;
+  const topic = req.body;
   let meta;
   try {
-    meta = PersonItems.replace(key, person);
+    meta = TopicItems.replace(key, topic);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -98,15 +98,15 @@ router.put(':key', function (req, res) {
     }
     throw e;
   }
-  Object.assign(person, meta);
-  res.send(person);
+  Object.assign(topic, meta);
+  res.send(topic);
 }, 'replace')
 .pathParam('key', keySchema)
-.body(Person, 'The data to replace the person with.')
-.response(Person, 'The new person.')
-.summary('Replace a person')
+.body(Topic, 'The data to replace the topic with.')
+.response(Topic, 'The new topic.')
+.summary('Replace a topic')
 .description(dd`
-  Replaces an existing person with the request body and
+  Replaces an existing topic with the request body and
   returns the new document.
 `);
 
@@ -114,10 +114,10 @@ router.put(':key', function (req, res) {
 router.patch(':key', function (req, res) {
   const key = req.pathParams.key;
   const patchData = req.body;
-  let person;
+  let topic;
   try {
-    PersonItems.update(key, patchData);
-    person = PersonItems.document(key);
+    TopicItems.update(key, patchData);
+    topic = TopicItems.document(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -127,14 +127,14 @@ router.patch(':key', function (req, res) {
     }
     throw e;
   }
-  res.send(person);
+  res.send(topic);
 }, 'update')
 .pathParam('key', keySchema)
-.body(joi.object().description('The data to update the person with.'))
-.response(Person, 'The updated person.')
-.summary('Update a person')
+.body(joi.object().description('The data to update the topic with.'))
+.response(Topic, 'The updated topic.')
+.summary('Update a topic')
 .description(dd`
-  Patches a person with the request body and
+  Patches a topic with the request body and
   returns the updated document.
 `);
 
@@ -142,7 +142,7 @@ router.patch(':key', function (req, res) {
 router.delete(':key', function (req, res) {
   const key = req.pathParams.key;
   try {
-    PersonItems.remove(key);
+    TopicItems.remove(key);
   } catch (e) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
@@ -152,7 +152,7 @@ router.delete(':key', function (req, res) {
 }, 'delete')
 .pathParam('key', keySchema)
 .response(null)
-.summary('Remove a person')
+.summary('Remove a topic')
 .description(dd`
-  Deletes a person from the database.
+  Deletes a topic from the database.
 `);

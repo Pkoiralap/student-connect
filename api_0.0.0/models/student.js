@@ -6,8 +6,13 @@ module.exports = {
   schema: {
     // Describe the attributes with joi here
     _key: joi.string(),
-    post_text: joi.string(),
-    username: joi.string(),
+    student_name: joi.string(),
+    student_DOB: joi.date(),
+    student_sex: joi.string().allow(["M", "F"]),
+
+    street: joi.string(),
+    city: joi.string(),
+    state: joi.string(),
   },
   forClient(obj) {
     // Implement outgoing transformations here

@@ -1,0 +1,27 @@
+.search-bar {
+    background: #f0f0f0;
+}
+
+.flex {
+    display: flex;
+}
+
+.search-bar form {
+    width: 300px;
+    margin: 10px;
+}
+
+.popup-div {
+    padding: 20px;
+    height: 700px;
+    overflow: auto;
+}
+
+.tickmark {
+    margin-left: 5px;
+}
+
+.tickmark::after {
+    content:"\2713\0020";
+    font-family: 'Lucida Sans Unicode', 'Arial Unicode MS', Arial;
+}

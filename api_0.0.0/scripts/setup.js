@@ -1,13 +1,17 @@
 'use strict';
 const db = require('@arangodb').db;
+
 const documentCollections = [
-  "Commnets",
-  "Education",
-  "Posts",
-  "Person"
+  "Student",
+  "School",
+  "Topic",
+  "Post",
+  "Comment",
+  "User",
+  "Session"
 ];
 const edgeCollections = [
-  "Relations"
+  "Relation"
 ];
 
 for (const localName of documentCollections) {
@@ -27,3 +31,20 @@ for (const localName of edgeCollections) {
     console.debug(`collection ${qualifiedName} already exists. Leaving it untouched.`)
   }
 }
+
+const users = module.context.collectionName('User');
+db._collection(users).ensureIndex({
+  type: 'hash',
+  fields: ['username'],
+  unique: true
+});
+
+
+
+const graph_module = require("@arangodb/general-graph");
+const edgeDefinitions = [ {
+  collection: `api_${edgeCollections[0]}`,
+  "from": documentCollections.map(item => `api_${item}`),
+  "to" : documentCollections.map(item => `api_${item}`),
+} ];
+graph_module._create("student-connect", edgeDefinitions);
