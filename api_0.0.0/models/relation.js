@@ -5,7 +5,10 @@ const joi = require('joi');
 module.exports = {
   schema: {
     // Describe the attributes with joi here
-    _key: joi.string()
+    _key: joi.string(),
+    _to: joi.string(),
+    _from: joi.string(),
+    type: joi.string(),
   },
   forClient(obj) {
     // Implement outgoing transformations here
